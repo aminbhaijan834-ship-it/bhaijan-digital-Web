@@ -1,0 +1,23 @@
+BHAIJAN DIGITAL - WEBSITE (GitHub Pages) - STEP BY STEP
+=======================================================
+Result: https://YOURUSERNAME.github.io/REPONAME/  - opens on mobile, TV, laptop, any browser.
+Free. No card. No sleeping server. News is rebuilt automatically by GitHub every ~5-15 min.
+
+1) github.com par login -> "+" -> New repository -> naam: bhaijan-digital -> Public -> Create.
+2) "uploading an existing file" par click -> is zip ke ANDAR ke saare files/folders drag karo
+   (zip ko pehle extract karo). IMPORTANT: ".github" folder bhi upload hona chahiye.
+   Agar ".github" nahi dikhta: Add file -> Create new file -> naam likho
+   .github/workflows/site.yml -> file ka content paste karo -> Commit.
+3) Settings -> Pages -> Source = "GitHub Actions".
+4) Actions tab -> "Build and deploy site" -> Run workflow (green button). 2-3 min wait.
+5) Settings -> Pages mein link aa jayega. Wahi link TV / mobile / laptop mein kholo.
+   Status check: link ke end mein /status/ lagao.
+
+NOTES
+- News har ~5-15 min mein update (GitHub cron kabhi late ho sakta hai).
+- Crypto prices aap ke browser mein LIVE aati hain (har refresh par).
+- Stocks/gold/USD-PKR utne fresh jitna last build.
+- Urdu translation is version mein nahi hai (sirf original headlines).
+- 60 din koi activity na ho to GitHub scheduled workflow band kar deta hai: Actions mein Run workflow dobara dabao.
+- Phone par: browser menu -> "Add to Home screen" = app jaisa icon.
+- Apni domain chahiye to Settings -> Pages -> Custom domain.

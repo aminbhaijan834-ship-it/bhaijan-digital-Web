@@ -1,0 +1,106 @@
+// Source registry. These URLs could NOT be verified from the build environment (no outbound internet there).
+// After deploying, open /api/health: every source shows ok/error with a count. Delete or fix failing ones; the app keeps working without them.
+//  cats = default categories   gate = general publisher: keep only stories that match one of our topics (see classify.js)
+const S = (id, name, url, cats, extra = {}) => ({ id, name, url, cats, lang: 'en', ...extra });
+// Google News search feeds: one per topic, newest stories from thousands of publishers. Refreshed every minute by the server.
+const GN = (id, q, cats, o = {}) => ({ id, name: 'Google News', gnews: true, cats, lang: 'en',
+  url: `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:' + (o.when || '2d'))}&hl=${o.hl || 'en-US'}&gl=${o.gl || 'US'}&ceid=${o.gl || 'US'}:${(o.hl || 'en-US').split('-')[0]}` });
+module.exports = [
+  // ---- Direct publisher feeds ----
+  // ---- Crypto ----
+  S('cointelegraph', 'Cointelegraph', 'https://cointelegraph.com/rss', ['crypto']),
+  S('coindesk', 'CoinDesk', 'https://www.coindesk.com/arc/outboundfeeds/rss/', ['crypto']),
+  S('decrypt', 'Decrypt', 'https://decrypt.co/feed', ['crypto']),
+  S('bitcoinmag', 'Bitcoin Magazine', 'https://bitcoinmagazine.com/.rss/full/', ['crypto']),
+  S('cryptoslate', 'CryptoSlate', 'https://cryptoslate.com/feed/', ['crypto']),
+  S('beincrypto', 'BeInCrypto', 'https://beincrypto.com/feed/', ['crypto']),
+  S('newsbtc', 'NewsBTC', 'https://www.newsbtc.com/feed/', ['crypto']),
+  S('theblock', 'The Block', 'https://www.theblock.co/rss.xml', ['crypto']),
+  S('cryptonews', 'Cryptonews', 'https://cryptonews.com/news/feed/', ['crypto']),
+  // ---- Stock markets / economy / commodities ----
+  S('cnbc-fin', 'CNBC', 'https://www.cnbc.com/id/10000664/device/rss/rss.html', ['stocks']),
+  S('cnbc-mkt', 'CNBC', 'https://www.cnbc.com/id/20910258/device/rss/rss.html', ['stocks']),
+  S('cnbc-inv', 'CNBC', 'https://www.cnbc.com/id/15839069/device/rss/rss.html', ['stocks']),
+  S('mw-top', 'MarketWatch', 'https://feeds.content.dowjones.io/public/rss/mw_topstories', ['stocks']),
+  S('mw-pulse', 'MarketWatch', 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse', ['stocks']),
+  S('yahoo-fin', 'Yahoo Finance', 'https://finance.yahoo.com/news/rssindex', ['stocks']),
+  S('investing', 'Investing.com', 'https://www.investing.com/rss/news.rss', ['stocks']),
+  S('seekingalpha', 'Seeking Alpha', 'https://seekingalpha.com/market_currents.xml', ['stocks']),
+  S('nasdaq', 'Nasdaq', 'https://www.nasdaq.com/feed/rssoutbound?category=Markets', ['stocks']),
+  S('fxstreet', 'FXStreet', 'https://www.fxstreet.com/rss/news', ['stocks']),
+  S('bbc-biz', 'BBC Business', 'https://feeds.bbci.co.uk/news/business/rss.xml', ['stocks'], { gate: true }),
+  // ---- Pakistan: PSX, rupee, gold, petrol, freelancing/tech (gated: only market/digital stories) ----
+  S('brecorder', 'Business Recorder', 'https://www.brecorder.com/feeds/latest-news', ['psx'], { gate: true }),
+  S('dawn-biz', 'Dawn Business', 'https://www.dawn.com/feeds/business', ['psx'], { gate: true }),
+  S('tribune-biz', 'Express Tribune', 'https://tribune.com.pk/feed/business', ['psx'], { gate: true }),
+  S('profit', 'Profit', 'https://profit.pakistantoday.com.pk/feed/', ['psx'], { gate: true }),
+  S('propakistani', 'ProPakistani', 'https://propakistani.pk/feed/', ['ai'], { gate: true }),
+  // ---- Social media (Facebook, Instagram, TikTok, X ...) ----
+  S('smtoday', 'Social Media Today', 'https://www.socialmediatoday.com/feeds/news/', ['social']),
+  S('smexaminer', 'Social Media Examiner', 'https://www.socialmediaexaminer.com/feed/', ['social']),
+  S('meta', 'Meta', 'https://about.fb.com/news/feed/', ['social']),
+  S('hootsuite', 'Hootsuite', 'https://blog.hootsuite.com/feed/', ['social']),
+  S('sprout', 'Sprout Social', 'https://sproutsocial.com/insights/feed/', ['social']),
+  S('tc-social', 'TechCrunch', 'https://techcrunch.com/category/social/feed/', ['social']),
+  // ---- WhatsApp ----
+  S('wabeta', 'WABetaInfo', 'https://wabetainfo.com/feed/', ['whatsapp']),
+  // ---- YouTube ----
+  S('yt-blog', 'YouTube Blog', 'https://blog.youtube/rss/', ['youtube']),
+  S('tubefilter', 'Tubefilter', 'https://www.tubefilter.com/feed/', ['youtube']),
+  // ---- AdSense, Google Ads, SEO, ad industry ----
+  S('google-ads', 'Google Ads & Commerce', 'https://blog.google/products/ads-commerce/rss/', ['adsense']),
+  S('sel', 'Search Engine Land', 'https://searchengineland.com/feed', ['seo'], { gate: true }),
+  S('sej', 'Search Engine Journal', 'https://www.searchenginejournal.com/feed/', ['seo'], { gate: true }),
+  S('seroundtable', 'Search Engine Roundtable', 'https://www.seroundtable.com/index.xml', ['seo'], { gate: true }),
+  S('ppcland', 'PPC Land', 'https://ppc.land/rss/', ['adsense']),
+  S('adweek', 'Adweek', 'https://www.adweek.com/feed/', ['adsense'], { gate: true }),
+  S('adexchanger', 'AdExchanger', 'https://www.adexchanger.com/feed/', ['adsense'], { gate: true }),
+  // ---- Amazon sellers / FBA ----
+  S('junglescout', 'Jungle Scout', 'https://www.junglescout.com/blog/feed/', ['amazon']),
+  S('feedvisor', 'Feedvisor', 'https://feedvisor.com/feed/', ['amazon']),
+  S('sellerapp', 'SellerApp', 'https://www.sellerapp.com/blog/feed/', ['amazon']),
+  S('marketplacepulse', 'Marketplace Pulse', 'https://www.marketplacepulse.com/feed', ['amazon', 'dropship']),
+  // ---- E-commerce & dropshipping ----
+  S('shopify', 'Shopify', 'https://www.shopify.com/blog.atom', ['dropship']),
+  S('practicalecom', 'Practical Ecommerce', 'https://www.practicalecommerce.com/feed', ['dropship']),
+  S('modernretail', 'Modern Retail', 'https://www.modernretail.co/feed/', ['dropship'], { gate: true }),
+  S('retaildive', 'Retail Dive', 'https://www.retaildive.com/feeds/news/', ['dropship'], { gate: true }),
+  S('dc360', 'Digital Commerce 360', 'https://www.digitalcommerce360.com/feed/', ['dropship']),
+  S('ecombytes', 'EcommerceBytes', 'https://www.ecommercebytes.com/feed/', ['dropship']),
+  S('ecomfuel', 'Ecommerce Fuel', 'https://ecommercefuel.com/feed/', ['dropship']),
+  S('bigcommerce', 'BigCommerce', 'https://www.bigcommerce.com/blog/feed/', ['dropship']),
+  // ---- AI & digital tech ----
+  S('tc-ai', 'TechCrunch', 'https://techcrunch.com/category/artificial-intelligence/feed/', ['ai']),
+  S('tc-main', 'TechCrunch', 'https://techcrunch.com/feed/', ['ai'], { gate: true }),
+  S('verge', 'The Verge', 'https://www.theverge.com/rss/index.xml', ['ai'], { gate: true }),
+  S('tnw', 'The Next Web', 'https://thenextweb.com/feed', ['ai'], { gate: true }),
+  S('openai', 'OpenAI', 'https://openai.com/news/rss.xml', ['ai']),
+  S('google-blog', 'Google', 'https://blog.google/rss/', ['ai'], { gate: true }),
+  // ---- Google News topic searches (these are what keep every category full) ----
+  GN('gn-btc', 'bitcoin OR ethereum OR crypto', ['crypto'], { when: '1d' }),
+  GN('gn-alt', 'solana OR XRP OR dogecoin OR altcoin OR stablecoin OR binance OR coinbase', ['crypto'], { when: '2d' }),
+  GN('gn-cmoves', 'crypto market OR bitcoin price surge OR plunge OR crash OR rally', ['crypto'], { when: '1d' }),
+  GN('gn-stocks', 'stock market OR "wall street" OR nasdaq OR "S&P 500"', ['stocks'], { when: '1d' }),
+  GN('gn-smoves', 'stocks surge OR plunge OR rally OR tumble OR record high', ['stocks'], { when: '1d' }),
+  GN('gn-comm', 'gold price OR oil price OR dollar index OR "federal reserve"', ['stocks'], { when: '1d' }),
+  GN('gn-psx', 'PSX OR "KSE-100" OR "Pakistan Stock Exchange"', ['psx'], { when: '2d', hl: 'en-PK', gl: 'PK' }),
+  GN('gn-pkr', 'rupee OR "dollar rate" OR "gold rate" OR "petrol price" Pakistan', ['psx'], { when: '2d', hl: 'en-PK', gl: 'PK' }),
+  GN('gn-fb', 'Facebook OR Instagram new feature OR update', ['social'], { when: '3d' }),
+  GN('gn-tt', 'TikTok OR Snapchat OR "X" OR Threads update creators', ['social'], { when: '3d' }),
+  GN('gn-meta', 'Meta Platforms OR Instagram OR Facebook creators monetization', ['social'], { when: '5d' }),
+  GN('gn-wa', 'WhatsApp new feature OR update OR channels OR business', ['whatsapp'], { when: '7d' }),
+  GN('gn-yt1', 'YouTube monetization OR "YouTube Partner Program" OR "YouTube Shorts"', ['youtube'], { when: '7d' }),
+  GN('gn-yt2', 'YouTube update OR algorithm OR creators OR policy', ['youtube'], { when: '3d' }),
+  GN('gn-yt3', 'YouTuber OR "YouTube channel" OR "YouTube Premium" OR "YouTube Studio"', ['youtube'], { when: '7d' }),
+  GN('gn-as1', '"Google AdSense" OR AdSense', ['adsense'], { when: '14d' }),
+  GN('gn-as2', '"Google Ads" update OR "ad revenue" OR CPM OR RPM publishers', ['adsense'], { when: '7d' }),
+  GN('gn-as3', 'Facebook monetization OR "Meta ads" OR "TikTok ads" OR "affiliate marketing"', ['adsense'], { when: '7d' }),
+  GN('gn-seo', 'Google "core update" OR "search algorithm" OR SEO OR "AI Overviews"', ['seo'], { when: '7d' }),
+  GN('gn-amz1', 'Amazon FBA OR "Amazon sellers" OR "Amazon seller"', ['amazon'], { when: '7d' }),
+  GN('gn-amz2', 'Amazon fees OR "Prime Day" OR "Amazon marketplace" OR "Amazon Pay"', ['amazon'], { when: '7d' }),
+  GN('gn-ds1', 'dropshipping', ['dropship'], { when: '7d' }),
+  GN('gn-ds2', 'Shopify OR "TikTok Shop" OR Temu OR AliExpress OR Etsy OR Daraz sellers', ['dropship'], { when: '7d' }),
+  GN('gn-ds3', 'ecommerce news OR "online selling" OR "online store"', ['dropship'], { when: '5d' }),
+  GN('gn-ai', 'ChatGPT OR OpenAI OR Gemini OR "artificial intelligence" tools', ['ai'], { when: '2d' }),
+  GN('gn-fin', 'PayPal OR Payoneer OR Stripe OR Wise OR Easypaisa OR JazzCash', ['ai'], { when: '7d' }),
+];
