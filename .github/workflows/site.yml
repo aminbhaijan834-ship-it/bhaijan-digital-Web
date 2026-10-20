@@ -1,0 +1,40 @@
+# Publishes the Bhaijan Digital website to GitHub Pages and refreshes its news/market data automatically.
+# One-time setup: repo Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+name: Update website data and publish
+on:
+  schedule:
+    - cron: '*/5 * * * *'     # GitHub runs this about every 5-15 minutes (not guaranteed to the minute)
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Collect news + markets and build the site
+        env:
+          PREV_SITE: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: node tools/build-static.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
